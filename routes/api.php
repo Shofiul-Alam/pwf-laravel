@@ -100,6 +100,8 @@ Route::name('forms')->post('forms/update-fields', 'Field\FieldController@updateF
  * Qualifications
  */
 Route::resource('qualifications', 'Qualification\QualificationController', ['except' => ['create', 'edit']]);
+Route::name('qualifications')->get('qualifications/list-by/employee',
+                'Qualification\QualificationController@getQualificationsByEmployee');
 
 
 /*
@@ -111,6 +113,8 @@ Route::resource('skills', 'Skill\SkillController', ['except' => ['create', 'edit
  * Inductions
  */
 Route::resource('inductions', 'Induction\InductionController', ['except' => ['create', 'edit']]);
+Route::name('inductions')->get('employee-inductions/list-by/employee',
+    'EmployeeInduction\EmployeeInductionController@getInductionsByEmployee');
 
 /*
  * EmployeeInductions

@@ -31,11 +31,28 @@ class Qualification extends BaseModel
     ];
 
     public function setIssueDateAttribute($value) {
-        $this->issue_date = Carbon::parse($value)->format('d/m/Y');
+        $this->attributes['issue_date'] = Carbon::parse($value)->format($this->formattedDates['in_format']);
+    }
+    public function getIssueDateAttribute() {
+        if($this->attributes['issue_date'] != null) {
+            return Carbon::parse($this->attributes['issue_date'])->format($this->formattedDates['out_format']);
+        } else {
+            return null;
+        }
+
     }
 
     public function setExpireDateAttribute($value) {
-        $this->expire_date = Carbon::parse($value)->format('d/m/Y');
+        $this->attributes['expire_date'] = Carbon::parse($value)->format($this->formattedDates['in_format']);
+    }
+
+    public function getExpireDateAttribute() {
+        if($this->attributes['expire_date'] != null) {
+            return Carbon::parse($this->attributes['expire_date'])->format($this->formattedDates['out_format']);
+        } else {
+            return null;
+        }
+
     }
 
     public function employee() {

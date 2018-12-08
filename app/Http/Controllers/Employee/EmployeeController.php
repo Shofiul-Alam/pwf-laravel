@@ -96,6 +96,9 @@ class EmployeeController extends ApiController
         $data = $request->all();
         if(isset($request->image)) {
             $data['avater_name'] = $request->image->store('');
+            $data['avater_url'] = $this->imageRoot. '/' . $data['avater_name'];
+            $data['avater_file_type'] = $request->image->getMimeType();
+            $data['avater_file_size'] = number_format($request->image->getSize()/1024/1024, 2) . "MB";
         }
 
         $data['isApproved'] = false;
@@ -133,19 +136,47 @@ class EmployeeController extends ApiController
      */
     public function update(Request $request, Employee $employee)
     {
+        $rules = [
+            'image'=>'image|mimes:jpg,png,jpeg|max:10240'
+        ];
+
+        $this->validate($request, $rules);
+
         $user = Auth::user();
 
 
-
         if(($user->employee && ($employee->id == $user->employee->id)) || $user->isAdmin()) {
+            $positions = array();
+
+            if(isset($request['positionsIdentifier']) && $user->isAdmin()){
+                $positionIds = explode($request['positionsIdentifier'], '|');
+                foreach ($positionIds as $id) {
+                    $position = Position::findOrFail($id);
+                    if($position) {
+                        array_push($positions, $position);
+                    }
+                }
+            } else {
+                $position = Position::findOrFail(2);
+                if($position) {
+                    array_push($positions, $position);
+                }
+            }
+            $request['positionsIdentifier'] = null;
+
 
             $employee->fill($request->all());
 
 
             if($request->hasFile('image')) {
+
                 Storage::delete($employee->avater_name);
 
                 $employee->avater_name = $request->image->store('');
+            }
+
+            if(count($positions) > 0) {
+                $employee->positions()->saveMany($positions);
             }
 
             if($employee->isClean()) {

@@ -14,6 +14,7 @@ class EmployeeInductionController extends ApiController
 
     public function __construct()
     {
+        parent::setImageRoot();
         $this->middleware('client.credentials')->only(['index', 'show']);
 
         $this->middleware('auth:api')->except(['resend', 'verify']);
@@ -34,6 +35,48 @@ class EmployeeInductionController extends ApiController
 //        return response()->json($employeeInductions, 200);
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getInductionsByEmployee(Request $request)
+    {
+
+        $user = Auth::user();
+
+        $authenticatedEmployeeId = false;
+        $employeeId = $request->input('employee');
+
+        if($user->employee && $authenticatedEmployeeId == $employeeId) {
+            $authenticatedEmployeeId = $user->employee->id;
+        }
+
+        if($authenticatedEmployeeId || $user->isAdmin()) {
+            $orderBy = EmployeeInductionTransformer::originalAttribute(
+                $request->input('orderBy')
+            );
+            $sort = $request->input('sort');
+
+            switch ($sort) {
+                case 'asc': $inductions = EmployeeInduction::all()->where('employee_id', $employeeId)->sortBy($orderBy);
+                    break;
+                case 'desc': $inductions = EmployeeInduction::all()->where('employee_id', $employeeId)->sortByDesc($orderBy);
+                    break;
+                default: $inductions = EmployeeInduction::all()->where('employee_id', $employeeId);
+                    break;
+
+            }
+
+
+            return $this->showAll($inductions);
+        } else {
+            return $this->errorResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+
+
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,7 +87,9 @@ class EmployeeInductionController extends ApiController
     public function store(Request $request)
     {
         $rules = [
+            'employee_id' => 'required',
             'form_id' => 'required',
+            'image'=>'image|mimes:jpg,png,jpeg|max:10240'
         ];
 
         $this->validate($request, $rules);
@@ -52,18 +97,32 @@ class EmployeeInductionController extends ApiController
         $user = Auth::user();
         $data = $request->all();
 
+        $authenticatedEmployeeId = false;
 
+        if($user->employee) {
+            $authenticatedEmployeeId = $user->employee->id;
+        }
 
-        if(isset($data['employee_id']) && $user->isAdmin()){
-            $data['employee_id'] = $data['employee_id'];
-        } else {
-            if($user->employee) {
-                $data['employee_id'] = $user->employee->id;
-            } else {
-                return response()->json(['error' => 'Unauthorize Access',
-                    'code' => Response::HTTP_UNAUTHORIZED], Response::HTTP_UNAUTHORIZED);
+        if($authenticatedEmployeeId || $user->isAdmin()) {
+            if(isset($request->image)) {
+                $data['induction_file_name'] = $request->image->store('');
+                $data['induction_file_url'] = $this->imageRoot. '/img/' . $data['induction_file_name'];
+                $data['induction_file_type'] = $request->image->getMimeType();
+                $data['induction_file_size'] = number_format($request->image->getSize()/1024/1024, 2) . "MB";
             }
 
+            if(isset($data['employee_id']) && $authenticatedEmployeeId == $data['employee_id'] || isset($data['employee_id']) && $user->isAdmin()) {
+                $data['employee_id'] = $data['employee_id'];
+
+            } else {
+                if($user->employee) {
+                    $data['employee_id'] = $user->employee->id;
+                } else {
+                    return response()->json(['error' => 'Unauthorize Access',
+                        'code' => Response::HTTP_UNAUTHORIZED], Response::HTTP_UNAUTHORIZED);
+                }
+
+            }
         }
 
 

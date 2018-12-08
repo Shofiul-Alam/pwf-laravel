@@ -30,7 +30,8 @@ class QualificationTransformer extends TransformerAbstract
             'createdOn' => (string) $qualification->created_at,
             'updatedOn' => (string) $qualification->updated_at,
             'deletedOn' => (string) $qualification->deleted_at,
-            'employee' => Employee::findOrFail($qualification->employee_id),
+            'employeeIdentifier' => Employee::findOrFail($qualification->employee_id) ?
+                                    Employee::findOrFail($qualification->employee_id)->id : [],
             'skill' => Skill::findOrFail($qualification->skill_id),
 
             'links' =>[

@@ -46,6 +46,8 @@ class Employee extends BaseModel
         'deleted_at',
         'user_id',
         'isApproved',
+        'lat',
+        'long',
     ];
 
     public function setDobAttribute($value) {

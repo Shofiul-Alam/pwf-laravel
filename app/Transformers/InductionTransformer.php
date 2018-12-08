@@ -4,6 +4,7 @@ namespace App\Transformers;
 
 
 
+use App\Models\Form;
 use App\Models\Induction;
 use App\Traits\ApiResponser;
 use League\Fractal\TransformerAbstract;
@@ -22,7 +23,12 @@ class InductionTransformer extends TransformerAbstract
 
     public function includeFileds(Induction $form)
     {
-        return $form->has('fields')->with('valueArr')->get();
+        if($form) {
+            return Form::findOrFail($form->id)->fields()->with('valueArr')->get();
+        } else {
+            return null;
+        }
+
 
     }
 
@@ -40,9 +46,12 @@ class InductionTransformer extends TransformerAbstract
             'name' => (string) $form->name,
             'isInduction' => (string) $form->isInduction,
             'inductionName' => (string) $form->induction_name,
+            'id' => (string) $form->id,
+            'text' => (string) $form->name,
             'createdOn' => (string) $form->created_at,
             'updatedOn' => (string) $form->updated_at,
             'deletedOn' => (string) $form->deleted_at,
+            'fields' => $this->includeFileds($form),
 
             'links' =>[
 //                [

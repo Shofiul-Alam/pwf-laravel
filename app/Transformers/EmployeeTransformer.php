@@ -49,8 +49,10 @@ class EmployeeTransformer extends TransformerAbstract
             'updatedOn' => (string) $employee->updated_at,
             'deletedOn' => (string) $employee->deleted_at,
             'approved' => $employee->isApproved,
+            'lat' => (string) $employee->lat,
+            'long' => (string) $employee->long,
             'user' => UserTransformer::transform(User::findOrFail($employee->user_id)),
-            'positions' => $employee->positions,
+            'positions' => $this->transformPositions($employee->positions),
 
             'links' =>[
 //                [
@@ -59,6 +61,15 @@ class EmployeeTransformer extends TransformerAbstract
 //                ],
             ]
         ];
+    }
+
+    private function transformPositions($positions) {
+        $positionsArr= array();
+        foreach ($positions as $position) {
+            array_push($positionsArr, PositionTransformer::transform($position));
+        }
+
+        return $positionsArr;
     }
 
     public static function originalAttribute($index) {
@@ -94,7 +105,10 @@ class EmployeeTransformer extends TransformerAbstract
             'deletedOn' => 'deleted_at',
             'approved' => 'isApproved',
             'userIdentifier' => 'user_id',
-            'positionsIdentifier' => 'position_id',
+            'image' => 'image',
+            'positionsIdentifier' => 'positionsIdentifier',
+            'lat' => 'lat',
+            'long' => 'long'
 
 
         ];
@@ -135,7 +149,8 @@ class EmployeeTransformer extends TransformerAbstract
             'deleted_at' => 'deletedOn',
             'isApproved' => 'approved',
             'user_id' => 'userIdentifier',
-            'position_id' => 'positionsIdentifier',
+            'lat' => 'lat',
+            'long' => 'long'
 
         ];
 

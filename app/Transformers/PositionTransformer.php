@@ -14,7 +14,7 @@ class PositionTransformer extends TransformerAbstract
      * @return array
      */
 
-    public function transform(Position $position)
+    public static function transform(Position $position)
     {
         return [
             'identifier' => (int) $position->id,

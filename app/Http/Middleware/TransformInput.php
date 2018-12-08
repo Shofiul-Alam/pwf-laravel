@@ -24,10 +24,15 @@ class TransformInput
                 $transformInput[$transformer::originalAttribute($input)] = $value;
             } else {
                 $className =ucfirst($input).'Transformer';
-                $transformer = '\\App\\Transformers\\'.$className;
-                foreach( $value as $keyInput=>$v) {
-                    $transformInput[$input][$transformer::originalAttribute($keyInput)] = $v;
+                $newTransformer = '\\App\\Transformers\\'.$className;
+                if(class_exists($newTransformer)) {
+                    foreach( $value as $keyInput=>$v) {
+                        $transformInput[$input][$newTransformer::originalAttribute($keyInput)] = $v;
+                    }
+                } else {
+                    $transformInput[$transformer::originalAttribute($input)] = $value;
                 }
+
             }
 
         }

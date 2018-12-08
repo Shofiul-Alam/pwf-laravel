@@ -28,6 +28,8 @@ class EmployeeInductionTransformer extends TransformerAbstract
             'updatedOn' => (string) $employeeInduction->updated_at,
             'deletedOn' => (string) $employeeInduction->deleted_at,
             'formIdentifier' => $employeeInduction->form_id,
+            'inductionName' => Form::findOrFail($employeeInduction->form_id)?
+                                    Form::findOrFail($employeeInduction->form_id)->induction_name : null,
             'employeeIdentifier' => $employeeInduction->employee_id,
 
             'links' =>[

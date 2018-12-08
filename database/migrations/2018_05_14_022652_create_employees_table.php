@@ -39,6 +39,8 @@ class CreateEmployeesTable extends Migration {
 			$table->string('avater_url', 200)->nullable();
 			$table->string('avater_file_type', 45)->nullable();
 			$table->string('avater_file_size', 45)->nullable();
+            $table->string('lat', 45)->nullable();
+            $table->string('long', 45)->nullable();
 			$table->dateTime('avater_updated_at')->nullable();
 			$table->boolean('isApproved');
 			$table->timestamps();

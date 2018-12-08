@@ -29,7 +29,7 @@ class InductionController extends ApiController
      */
     public function index()
     {
-        $forms = Form::where('isInduction', true)->get();
+        $forms = Induction::all();
 
         return $this->showAll($forms);
     }

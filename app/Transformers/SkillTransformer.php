@@ -22,6 +22,8 @@ class SkillTransformer extends TransformerAbstract
             'createdOn' => (string) $skill->created_at,
             'updatedOn' => (string) $skill->updated_at,
             'deletedOn' => (string) $skill->deleted_at,
+            'id' => (string) $skill->id,
+            'text' => (string) $skill->name,
 
             'links' =>[
 //                [
